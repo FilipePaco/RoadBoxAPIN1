@@ -77,10 +77,18 @@ WSGI_APPLICATION = 'roadbox_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',  # Usa o backend do MySQL, que é compatível com MariaDB
+        'NAME': 'roadbox_ubiquo',
+        'USER': 'root',
+        'PASSWORD': 'admin123',
+        'HOST': 'localhost',  # Ou o IP do servidor MariaDB
+        'PORT': '3306',       # Porta padrão do MariaDB
+        'OPTIONS': {
+            'charset': 'utf8mb4',  # Para suportar caracteres especiais e emojis
+        },
     }
 }
+
 
 
 # Password validation

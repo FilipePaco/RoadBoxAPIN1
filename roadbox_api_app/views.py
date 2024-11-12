@@ -35,7 +35,7 @@ class FrameUploadView(APIView):
             frame_paths = self.save_frames(frames)  # Salva múltiplos frames
             
             # Analisar todos os frames
-            detected_frames = analyze_frames(frame_paths, coordinates, model)
+            detected_frames = analyze_frames(frames=frame_paths, longitude=coordinates, latitude=coordinates,model=model,dispositivo="dispositivoteste")
             
             return Response({
                 "message": "Frames e coordenadas recebidos com sucesso!",
