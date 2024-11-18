@@ -23,10 +23,15 @@ class FrameUploadView(APIView):
     def post(self, request):
         print(request.data)
         serializer = FrameSerializer(data=request.data)
+        
         if serializer.is_valid():
-            frames = serializer.validated_data['frames']  # Lista de frames
-            coordinates = serializer.validated_data['coordinates']
-            print(f'FRAMES ENVIADOS{frames}')
+            frames = request.data.get('frames')  # Lista de frames
+            latitude = serializer.validated_data['latitude']
+            longitude = serializer.validated_data['longitude']
+            dispositivo = serializer.validated_data['dispositivo']
+
+            print(f'FRAMES ENVIADOS: {frames}')
+            
             # Se 'frames' não for uma lista, coloque-o dentro de uma lista
             if not isinstance(frames, list):
                 frames = [frames]
@@ -35,7 +40,7 @@ class FrameUploadView(APIView):
             frame_paths = self.save_frames(frames)  # Salva múltiplos frames
             
             # Analisar todos os frames
-            detected_frames = analyze_frames(frames=frame_paths, longitude=coordinates, latitude=coordinates,model=model,dispositivo="dispositivoteste")
+            detected_frames = analyze_frames(frames=frame_paths, longitude=longitude, latitude=latitude, model=model, dispositivo=dispositivo)
             
             return Response({
                 "message": "Frames e coordenadas recebidos com sucesso!",

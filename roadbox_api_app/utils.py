@@ -98,7 +98,8 @@ def analyze_frames(frames, model: YOLO, dispositivo, latitude, longitude):
                     save_path = os.path.join(coord_folder, frame_name)
                     cv.imwrite(save_path, image)
                     # Upload para o Google Drive e obter o link
-                    drive_link = upload_to_drive(save_path)
+                    #drive_link = upload_to_drive(save_path)
+                    drive_link = 'apigoogleforadoar'
 
                     salvar_no_banco(dispositivo=dispositivo,drive_link= drive_link,latitude= latitude,longitude= longitude)
 
