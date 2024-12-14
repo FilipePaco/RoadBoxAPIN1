@@ -1,36 +1,16 @@
 import os
+import requests
 from ultralytics import YOLO
 import cv2 as cv
 import random
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
 from datetime import datetime
 from .models import EnvioDeSinistro
+from .uploadimage import upload_image_to_drive
 
-project_dir = os.path.dirname(os.path.abspath(__file__))
 
-
-cred_path = os.path.join(project_dir, 'settings.yaml')
-if os.path.exists(cred_path):    
-    print(f"Modelo carregado com sucesso de: {cred_path}")
-else:
-    raise FileNotFoundError(f"Arquivo de modelo não encontrado em: {cred_path}")
-gauth = GoogleAuth()
-gauth.LoadCredentialsFile(cred_path)
-
-if gauth.credentials is None:
-    gauth.LocalWebserverAuth()
-elif gauth.access_token_expired:
-    gauth.Refresh()
-else:
-    gauth.Authorize()
-
-gauth.SaveCredentialsFile("settings.yaml")
-
-drive = GoogleDrive(gauth)
 
 def salvar_no_banco(dispositivo, drive_link, latitude, longitude):
-    EnvioDeSinistro.objects.create(
+    return EnvioDeSinistro.objects.create(
         dispositivo=dispositivo,
         foto_sinistro=drive_link,
         data_hora=datetime.now(),
@@ -38,16 +18,7 @@ def salvar_no_banco(dispositivo, drive_link, latitude, longitude):
         longitude=longitude
     )
 
-def upload_to_drive(file_path):
-    file_drive = drive.CreateFile({'title': os.path.basename(file_path)})
-    file_drive.SetContentFile(file_path)
-    file_drive.Upload()
-    file_drive.InsertPermission({
-        'type': 'anyone',
-        'value': 'anyone',
-        'role': 'reader'
-    })
-    return file_drive['alternateLink']
+
 
 def analyze_frames(frames, model: YOLO, dispositivo, latitude, longitude):
     global cursor
@@ -98,12 +69,28 @@ def analyze_frames(frames, model: YOLO, dispositivo, latitude, longitude):
                     save_path = os.path.join(coord_folder, frame_name)
                     cv.imwrite(save_path, image)
                     # Upload para o Google Drive e obter o link
-                    #drive_link = upload_to_drive(save_path)
-                    drive_link = 'apigoogleforadoar'
+                    drive_link = upload_image_to_drive(save_path)
 
-                    salvar_no_banco(dispositivo=dispositivo,drive_link= drive_link,latitude= latitude,longitude= longitude)
-
+                    id_envio = salvar_no_banco(dispositivo=dispositivo,drive_link= drive_link,latitude= latitude,longitude= longitude).id_envio
+                    enviar_cloud_api(id_envio)
                     detected_frames.append(drive_link)
                     break  # Saia do loop após salvar e fazer upload de um acidente
-
+    
     return detected_frames
+
+def enviar_cloud_api(id_envio):
+    # Exemplo de URL da API onde você deseja enviar o id_envio
+    url_api = "http://127.0.0.1:8083/api/processar/"
+    
+    # Dados a serem enviados para a API
+    dados = {
+        "id_envio": id_envio
+    }
+
+    # Faz a requisição POST para a API
+    response = requests.post(url_api, json=dados)
+
+    if response.status_code == 200:
+        print(f"ID envio {id_envio} enviado com sucesso para a API.")
+    else:
+        print(f"Erro ao enviar o ID envio {id_envio} para a API: {response.status_code}, {response.text}")

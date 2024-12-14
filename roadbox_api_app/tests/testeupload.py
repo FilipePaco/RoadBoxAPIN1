@@ -6,7 +6,7 @@ from pydrive.drive import GoogleDrive
 gauth = GoogleAuth()
 gauth.LoadCredentialsFile('settings.yaml')
 
-"""if gauth.credentials is None:
+if gauth.credentials is None:
     # Primeira autenticação, requer navegação e login
     gauth.LocalWebserverAuth()
 elif gauth.access_token_expired:
@@ -17,7 +17,7 @@ else:
     gauth.Authorize()
 
 # Salva as credenciais para reutilização
-gauth.SaveCredentialsFile("settings.yaml")"""
+gauth.SaveCredentialsFile("settings.yaml")
 
 drive = GoogleDrive(gauth)
 
