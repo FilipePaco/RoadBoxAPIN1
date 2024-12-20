@@ -136,7 +136,6 @@ tinycss2==1.2.1
 toml==0.10.2
 toposort==1.10
 torch==2.3.0
-torchaudio==2.3.0+cu118
 torchvision==0.18.0
 tornado==6.4
 tqdm==4.66.2
