@@ -55,14 +55,36 @@ def analyze_frames(frames, model: YOLO, dispositivo, latitude, longitude):
                         3
                     )
                     fonte = cv.FONT_HERSHEY_COMPLEX
+                    # Configuração do texto
+                    fonte = cv.FONT_HERSHEY_COMPLEX
+                    tamanho_fonte = 0.8
+                    cor_texto = (255, 255, 255)  # Branco
+                    cor_contorno = (0, 0, 0)  # Preto
+
+                    # Posição do texto (ajustada para não ser cortada)
+                    x_text = max(int(bb[0]), 0)
+                    y_text = max(int(bb[1]) - 10, 20)
+                    texto = f"{lista_classes[id_classe]} {round(confianca, 3)}"
+                     # Desenhar o texto com contorno
                     cv.putText(
                         image,
-                        f"{lista_classes[id_classe]} {round(confianca, 3)}",
-                        (int(bb[0]), int(bb[1]) - 10),
+                        texto,
+                        (x_text, y_text),
                         fonte,
-                        1,
-                        (255, 255, 255),
-                        2
+                        tamanho_fonte,
+                        cor_contorno,  # Contorno
+                        thickness=4,
+                        lineType=cv.LINE_AA
+                    )
+                    cv.putText(
+                        image,
+                        texto,
+                        (x_text, y_text),
+                        fonte,
+                        tamanho_fonte,
+                        cor_texto,  # Texto principal
+                        thickness=2,
+                        lineType=cv.LINE_AA
                     )
 
                     frame_name = os.path.basename(frame_path)
@@ -80,7 +102,7 @@ def analyze_frames(frames, model: YOLO, dispositivo, latitude, longitude):
 
 def enviar_cloud_api(id_envio):
     # Exemplo de URL da API onde você deseja enviar o id_envio
-    url_api = "http://127.0.0.1:8083/api/processar/"
+    url_api = "https://roadboxcloudapi-production.up.railway.app/api/processar/"
     
     # Dados a serem enviados para a API
     dados = {

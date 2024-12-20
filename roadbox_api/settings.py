@@ -10,8 +10,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
+import dj_database_url
+import pymysql
+pymysql.version_info = (1, 4, 6, 'final', 0)  # change mysqlclient version
+pymysql.install_as_MySQLdb()
+
+from dotenv import load_dotenv  # Adicionado para carregar o arquivo .env
+
+load_dotenv() 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,9 +34,15 @@ SECRET_KEY = 'django-insecure-wu4r&4jz$ou5yu42m%5x%!px-&b6&11y_1=2gls)omj#)d!j7y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = [
+    'https://mysql-production-c684.up.railway.app',  # URL da API no Railway
+    'http://192.168.69.145:8000',  # Endereço local para testes
+]
 
 
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT =os.path.join(BASE_DIR, 'staticfiles')
 # Application definition
 
 INSTALLED_APPS = [
@@ -75,18 +90,9 @@ WSGI_APPLICATION = 'roadbox_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# Configuração do banco de dados
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',  # Usa o backend do MySQL, que é compatível com MariaDB
-        'NAME': 'roadbox_ubiquo',
-        'USER': 'root',
-        'PASSWORD': 'admin123',
-        'HOST': 'localhost',  # Ou o IP do servidor MariaDB
-        'PORT': '3306',       # Porta padrão do MariaDB
-        'OPTIONS': {
-            'charset': 'utf8mb4',  # Para suportar caracteres especiais e emojis
-        },
-    }
+    'default': dj_database_url.parse(os.getenv('DATABASE_URL'))
 }
 
 
