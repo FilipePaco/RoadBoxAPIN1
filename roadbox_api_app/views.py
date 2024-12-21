@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import FrameSerializer
-from .utils import analyze_frames
+from .utils import *
 from ultralytics import YOLO
 
 # Obtenha o caminho absoluto para o diretório atual do projeto
@@ -19,7 +19,20 @@ if os.path.exists(model_path):
 else:
     raise FileNotFoundError(f"Arquivo de modelo não encontrado em: {model_path}")
 
+
+class Camera(APIView):
+    def post(self,request):
+        latitude = request.data.get('latitude')
+        longitude = request.data.get('longitude')
+        dispositivo = request.data.get('dispositivo')
+        link = request.data.get('links_frames')
+        salvar_no_banco(dispositivo=dispositivo,latitude=latitude,longitude=longitude,drive_link=link)
+        return Response({
+                "message": "Frames e coordenadas recebidos com sucesso!",
+            }, status=status.HTTP_201_CREATED)
 class FrameUploadView(APIView):
+         
+        
     def post(self, request):
         print(request.data)
         serializer = FrameSerializer(data=request.data)

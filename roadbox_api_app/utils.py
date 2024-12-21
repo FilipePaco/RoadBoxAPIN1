@@ -10,15 +10,16 @@ from .uploadimage import upload_image_to_drive
 
 
 def salvar_no_banco(dispositivo, drive_link, latitude, longitude):
-    return EnvioDeSinistro.objects.create(
+    ab = EnvioDeSinistro.objects.create(
         dispositivo=dispositivo,
         foto_sinistro=drive_link,
         data_hora=datetime.now(),
         latitude=latitude,
         longitude=longitude
-    )
+    )    
+    enviar_cloud_api(ab.id_envio)
 
-
+    
 
 def analyze_frames(frames, model: YOLO, dispositivo, latitude, longitude):
     global cursor
@@ -93,8 +94,7 @@ def analyze_frames(frames, model: YOLO, dispositivo, latitude, longitude):
                     # Upload para o Google Drive e obter o link
                     drive_link = upload_image_to_drive(save_path)
 
-                    id_envio = salvar_no_banco(dispositivo=dispositivo,drive_link= drive_link,latitude= latitude,longitude= longitude).id_envio
-                    enviar_cloud_api(id_envio)
+                    salvar_no_banco(dispositivo=dispositivo,drive_link= drive_link,latitude= latitude,longitude= longitude).id_envio
                     detected_frames.append(drive_link)
                     break  # Saia do loop após salvar e fazer upload de um acidente
     
